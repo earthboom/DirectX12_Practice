@@ -50,7 +50,7 @@ void TableDescriptorHeap::CommitTable()
 	//현재 Descriptor Heap의 그룹이 GPU에 점유한 주소를 Table에 보내는 작업
 	D3D12_GPU_DESCRIPTOR_HANDLE handle = _descHeap->GetGPUDescriptorHandleForHeapStart();
 	handle.ptr += _currentGroupIndex * _groupSize;
-	CMD_LIST->SetGraphicsRootDescriptorTable(0, handle);
+	CMD_LIST->SetGraphicsRootDescriptorTable(1, handle);
 
 	++_currentGroupIndex;	//다음 그룹으로
 }

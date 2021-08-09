@@ -214,7 +214,7 @@
     <None Include="SimpleMath.inl">
       <Filter>Utils</Filter>
     </None>
-    <None Include="..\Resources\Shader\parmas.hlsli">
+    <None Include="..\Resources\Shader\params.hlsli">
       <Filter>Shader</Filter>
     </None>
     <None Include="..\Resources\Shader\utils.hlsli">

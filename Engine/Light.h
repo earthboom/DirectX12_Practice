@@ -5,7 +5,7 @@
 //ºûÀÇ Á¾·ù
 enum class LIGHT_TYPE : uint8
 {
-	DIRECTION_LIGHT,
+	DIRECTIONAL_LIGHT,
 	POINT_LIGHT,
 	SPOT_LIGHT,
 };
@@ -55,7 +55,7 @@ public:
 	void SetAmbient(const Vec3& ambient) { _lightInfo.color.ambient = ambient; }
 	void SetSpecular(const Vec3& specular) { _lightInfo.color.specular = specular; }
 
-	void LightType(LIGHT_TYPE type) { _lightInfo.lightType = static_cast<int32>(type); }
+	void SetLightType(LIGHT_TYPE type) { _lightInfo.lightType = static_cast<int32>(type); }
 	void SetLightRange(float range) { _lightInfo.range = range; }
 	void SetLightAngle(float angle) { _lightInfo.angle = angle; }
 

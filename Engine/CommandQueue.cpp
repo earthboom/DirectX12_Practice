@@ -85,7 +85,7 @@ void CommandQueue::RenderBegin(const D3D12_VIEWPORT* vp, const D3D12_RECT* rect)
 	// 어떤 Buffer에 그림을 그릴 것인지를 구체적으로 정함.
 	// GPU에게 BackBuffer가 무엇인지 전해줌.
 	D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = _swapChain->GetBackRTV();
-	_cmdList->ClearRenderTargetView(backBufferView, Colors::LightSteelBlue, 0, nullptr);
+	_cmdList->ClearRenderTargetView(backBufferView, Colors::Black, 0, nullptr);
 
 	//Depth Stencil Buffer의 핸들을 가져와서 OM(Out Merger)단계에서 사용.
 	D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = GEngine->GetDepthStencilBuffer()->getDSVCpuHandle();

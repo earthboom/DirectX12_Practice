@@ -35,13 +35,13 @@ struct LightColor
 
 struct LightInfo
 {
-    LightColor	color;		
-    float4		Position;	
-    float4		direction;	
-    int 		lightType;	
-    float		range;		
-    float		angle;		
-    int 		padding;	
+    LightColor  color;
+    float4	    position;
+    float4	    direction;
+    int		    lightType;
+    float	    range;
+    float	    angle;
+    int  	    padding;
 };
 
 cbuffer GLOBAL_PARAMS : register(b0)
@@ -70,7 +70,6 @@ cbuffer MATERIAL_PARAMS : register(b2)
     int     g_int_2;
     int     g_int_3;
     int     g_int_4;
-    
     float   g_float_0;
     float   g_float_1;
     float   g_float_2;

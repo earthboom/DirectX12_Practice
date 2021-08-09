@@ -17,7 +17,7 @@ public:
 	const Vec3& GetLocalScale() { return _localscale; }
 
 	const Matrix& GetLocalToWorldMatrix() { return _matWorld; }	// Local -> World 변환 행렬
-	const Vec3& GetWorldPosition() { return _matWorld.Translation(); }	// World 좌표
+	Vec3 GetWorldPosition() { return _matWorld.Translation(); }	// World 좌표
 
 	// World 기준
 	Vec3 GetRight() { return _matWorld.Right(); }
