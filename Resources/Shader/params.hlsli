@@ -75,6 +75,11 @@ cbuffer MATERIAL_PARAMS : register(b2)
     float   g_float_2;
     float   g_float_3;
     float   g_float_4;
+    int     g_tex_on_0;
+    int     g_tex_on_1;
+    int     g_tex_on_2;
+    int     g_tex_on_3;
+    int     g_tex_on_4;
 };
 
 // Texture¸¦ ¹ÞÀ½.
