@@ -12,6 +12,8 @@ enum class KEY_TYPE
 	S = 'S',
 	D = 'D',
 
+	R = 'R',
+	F = 'F',
 	Q = 'Q',
 	E = 'E',
 };

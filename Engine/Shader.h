@@ -2,6 +2,29 @@
 
 #include "Object.h"
 
+enum class RASTERIZER_TYPE
+{
+	CULL_NONE,	// 무시하지 않음
+	CULL_FRONT,	// 시계 방향 무시
+	CULL_BACK,	// 반시계 방향 무시
+	WIREFRAME,
+};
+
+enum class DEPTH_STENCIL_TYPE
+{
+	LESS,
+	LESS_EQUAL,		
+	GREATER,
+	GREATER_EQUAL,
+};
+
+struct ShaderInfo
+{
+	// 기본 상태
+	RASTERIZER_TYPE rasterizerType = RASTERIZER_TYPE::CULL_BACK;
+	DEPTH_STENCIL_TYPE depthStencilType = DEPTH_STENCIL_TYPE::LESS;
+};
+
 // 일감 기술서에 비유
 // 일을 처리함에 있어서 무엇을 해야할지를 기술함.
 
@@ -11,7 +34,7 @@ public:
 	Shader();
 	virtual ~Shader();
 
-	void Init(const wstring& path);
+	void Init(const wstring& path, ShaderInfo info = ShaderInfo());
 	void Update();
 
 private:

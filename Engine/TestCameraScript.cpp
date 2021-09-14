@@ -32,17 +32,31 @@ void TestCameraScript::LateUpdate()
 		pos += GetTransform()->GetRight() * _speed * DELTA_TIME;
 
 	//È¸Àü
-	if (INPUT->GetButton(KEY_TYPE::Q))
+	if (INPUT->GetButton(KEY_TYPE::F))
 	{
 		Vec3 rotation = GetTransform()->GetLocalRotation();
 		rotation.x += DELTA_TIME * 0.5f;
 		GetTransform()->SetLocalRotation(rotation);
 	}
 
-	if (INPUT->GetButton(KEY_TYPE::E))
+	if (INPUT->GetButton(KEY_TYPE::R))
 	{
 		Vec3 rotation = GetTransform()->GetLocalRotation();
 		rotation.x -= DELTA_TIME * 0.5f;
+		GetTransform()->SetLocalRotation(rotation);
+	}
+
+	if (INPUT->GetButton(KEY_TYPE::E))
+	{
+		Vec3 rotation = GetTransform()->GetLocalRotation();
+		rotation.y += DELTA_TIME * 0.5f;
+		GetTransform()->SetLocalRotation(rotation);
+	}
+
+	if (INPUT->GetButton(KEY_TYPE::Q))
+	{
+		Vec3 rotation = GetTransform()->GetLocalRotation();
+		rotation.y -= DELTA_TIME * 0.5f;
 		GetTransform()->SetLocalRotation(rotation);
 	}
 
