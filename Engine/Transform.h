@@ -12,9 +12,13 @@ public:
 	void PushData();
 
 public:
+	// parent 기준
 	const Vec3& GetLocalPosition() { return _localposition; }
 	const Vec3& GetLocalRotation() { return _localrotation; }
 	const Vec3& GetLocalScale() { return _localscale; }
+
+	// test code
+	float GetBoundingSphereRadius() { return max(max(_localscale.x, _localscale.y), _localscale.z); }
 
 	const Matrix& GetLocalToWorldMatrix() { return _matWorld; }	// Local -> World 변환 행렬
 	Vec3 GetWorldPosition() { return _matWorld.Translation(); }	// World 좌표

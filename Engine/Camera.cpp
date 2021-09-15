@@ -36,6 +36,8 @@ void Camera::FinalUpdate()
 
 	S_MatView = _matView;
 	S_MatProjection = _matProjection;
+
+	_frustum.FinalUpdate();
 }
 
 void Camera::Render()
@@ -49,6 +51,16 @@ void Camera::Render()
 	{
 		if (gameObject->GetMeshRenderer() == nullptr)
 			continue;
+
+		if (gameObject->GetCheckFrustum())	// 절두체 컬링을 허용하는 오브젝트인가?
+		{
+			if (_frustum.ContainSphere(
+				gameObject->GetTransform()->GetWorldPosition(),
+				gameObject->GetTransform()->GetBoundingSphereRadius()) == false)
+			{
+				continue;
+			}
+		}
 
 		gameObject->GetMeshRenderer()->Render();
 	}
