@@ -33,15 +33,15 @@ void Camera::FinalUpdate()
 		_matProjection = ::XMMatrixPerspectiveFovLH(_fov, width / height, _near, _far);
 	else // 직교투영
 		_matProjection = ::XMMatrixOrthographicLH(width * _scale, height * _scale, _near, _far);
-
-	S_MatView = _matView;
-	S_MatProjection = _matProjection;
-
+	
 	_frustum.FinalUpdate();
 }
 
 void Camera::Render()
 {
+	S_MatView = _matView;
+	S_MatProjection = _matProjection;
+
 	shared_ptr<Scene> scene = GET_SINGLE(SceneManager)->GetActiveScene();
 
 	// Layer 구분
@@ -50,6 +50,10 @@ void Camera::Render()
 	for (auto& gameObject : gameobjects)
 	{
 		if (gameObject->GetMeshRenderer() == nullptr)
+			continue;
+
+		// 자신이 찍고 있는 layer인가를 구분
+		if (IsCulled(gameObject->GetLayerIndex()))
 			continue;
 
 		if (gameObject->GetCheckFrustum())	// 절두체 컬링을 허용하는 오브젝트인가?

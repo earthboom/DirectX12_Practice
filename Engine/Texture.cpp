@@ -11,7 +11,7 @@ Texture::~Texture()
 {
 }
 
-void Texture::Init(const wstring& path)
+void Texture::Load(const wstring& path)
 {
 	CreateTexture(path);	//해당 위치에서 텍스처를 로드
 	CreateView();

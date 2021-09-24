@@ -1,8 +1,8 @@
-#ifndef _DEFAULT_HLSLI_
-#define _DEFAULT_HLSLI_
+#ifndef _FORWARD_FX_
+#define _FORWARD_FX_
 
-#include "params.hlsli"
-#include "utils.hlsli"
+#include "params.fx"
+#include "utils.fx"
 
 struct VS_IN
 {

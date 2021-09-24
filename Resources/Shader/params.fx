@@ -1,5 +1,5 @@
-#ifndef _PARAMS_HLSLI_
-#define _PARAMS_HLSLI_
+#ifndef _PARAMS_FX_
+#define _PARAMS_FX_
 
 //packing 룰이 있음. 
 //어떤 구조체를 만들 때, 실질적으로 메모리에 올라갈 때, 메모리 정렬 순서를 의미
