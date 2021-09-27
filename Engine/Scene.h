@@ -12,6 +12,7 @@ public:
 	void FinalUpdate();
 
 	void Render();
+
 private:
 	void PushLightData();
 

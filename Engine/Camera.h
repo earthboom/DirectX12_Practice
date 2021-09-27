@@ -16,10 +16,13 @@ public:
 	virtual ~Camera();
 
 	virtual void FinalUpdate() override;
-	void Render();
 
 	void SetProjectionType(PROJECTION_TYPE type) { _type = type; }
 	PROJECTION_TYPE GetProjectionType() { return _type; }
+
+	void SortGameObject();
+	void Render_Deferred();
+	void Render_Forward();
 
 	// 특정 layer를 끄고 킬 수 있는 함수.  
 	// ture : 찍지 않음,  false : 찍음
@@ -49,6 +52,11 @@ private:
 
 	Frustum _frustum;
 	uint32 _cullingMask = 0;	// 32bit 2진수로 찍어야 할 Layer를 분류.
+
+private:
+	// 그려줄 물체들을 Deferred, Forward 구분하여 저장해 둠
+	vector<shared_ptr<GameObject>> _vecDeferred;
+	vector<shared_ptr<GameObject>> _vecForward;
 
 public:
 	//Temp

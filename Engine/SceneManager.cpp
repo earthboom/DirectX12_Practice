@@ -139,7 +139,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 			meshRenderer->SetMesh(sphereMesh);
 		}
 		{
-			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Forward");
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
 			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Substance", L"..\\Resources\\Texture\\Substance.jpg");
 			shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Substance_Normal", L"..\\Resources\\Texture\\Substance_Normal.jpg");			
 			shared_ptr<Material> material = make_shared<Material>();
@@ -154,21 +154,22 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 #pragma endregion
 
 #pragma region UI_Test
+	for (int32 i = 0; i < 3; ++i)
 	{
 		shared_ptr<GameObject> sphere = make_shared<GameObject>();
 		sphere->SetLayerIndex(GET_SINGLE(SceneManager)->LayerNameToIndex(L"UI"));	//UI
 		sphere->AddComponent(make_shared<Transform>());
 		sphere->GetTransform()->SetLocalScale(Vec3(100.0f, 100.0f, 100.0f));
-		sphere->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 500.0f));
+		sphere->GetTransform()->SetLocalPosition(Vec3(-350.0f + (i * 160.0f), 250.0f, 500.0f));
 
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
 		{
-			shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadRectangleMesh();
-			meshRenderer->SetMesh(sphereMesh);
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
 		}
 		{
 			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Forward");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Substance", L"..\\Resources\\Texture\\Substance.jpg");
+			shared_ptr<Texture> texture = GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->GetRTTexture(i);
 			shared_ptr<Material> material = make_shared<Material>();
 			material->SetShader(shader);
 			material->SetTexture(0, texture);

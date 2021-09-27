@@ -54,13 +54,32 @@ void Scene::Render()
 	// Light 세팅
 	PushLightData();
 
+	//SwapChain Group 초기화
+	int8 backIndex = GEngine->GetSwapChain()->GetBackBufferIndex();
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->ClearRenderTargetView(backIndex);
+
+	//Deferred Group 초기화
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->ClearRenderTargetView();
+
 	// Camera를 찾아서 Render함.
 	for (auto& gameObject : _gameObjects)
 	{
 		if (gameObject->GetCamera() == nullptr)
 			continue;
 
-		gameObject->GetCamera()->Render();
+		// Forward, Deferred 구분
+		gameObject->GetCamera()->SortGameObject();
+
+		// Deferred OMSet
+		// G_BUFFER의 Render Target Texture의 데이터가 deferred.fx 의 PS_Main에서 연산됨.
+		GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->OMSetRenderTargets();
+		gameObject->GetCamera()->Render_Deferred();
+
+		// Light OMSet
+
+		// Swapchain OMSet
+		GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->OMSetRenderTargets(1, backIndex);
+		gameObject->GetCamera()->Render_Forward();
 	}
 }
 

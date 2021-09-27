@@ -29,23 +29,24 @@ public:
 	void SwapIndex();
 	
 	ComPtr<IDXGISwapChain> GetSwapChain() { return _swapChain; }
-	ComPtr<ID3D12Resource> GetRenderTarget(int32 index) { return _rtvBuffer[index]; }
+	uint32 GetBackBufferIndex() { return _backBufferIndex; }
+	//ComPtr<ID3D12Resource> GetRenderTarget(int32 index) { return _rtvBuffer[index]; }
 
-	ComPtr<ID3D12Resource> GetBackRTVBuffer() { return _rtvBuffer[_backBufferIndex]; }
-	D3D12_CPU_DESCRIPTOR_HANDLE GetBackRTV() { return _rtvHandle[_backBufferIndex]; }
+	//ComPtr<ID3D12Resource> GetBackRTVBuffer() { return _rtvBuffer[_backBufferIndex]; }
+	//D3D12_CPU_DESCRIPTOR_HANDLE GetBackRTV() { return _rtvHandle[_backBufferIndex]; }
 
 private:
 	void CreateSwapChain(const WindowInfo& info, ComPtr<IDXGIFactory> dxgi, ComPtr<ID3D12CommandQueue> cmdQueue);
-	void CreateRTV(ComPtr<ID3D12Device> device);
+	//void CreateRTV(ComPtr<ID3D12Device> device);
 
 private:
 	ComPtr<IDXGISwapChain>	_swapChain;
 
 	//리소스에 대해 전체적으로 서술
 	// { {view}, {view} } -> 각각의 view는 리소스를 설명.
-	ComPtr<ID3D12Resource>			_rtvBuffer[SWAP_CHAIN_BUFFER_COUNT];	//특수 종이에 해당.
-	ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
-	D3D12_CPU_DESCRIPTOR_HANDLE		_rtvHandle[SWAP_CHAIN_BUFFER_COUNT];
+	//ComPtr<ID3D12Resource>			_rtvBuffer[SWAP_CHAIN_BUFFER_COUNT];	//특수 종이에 해당.
+	//ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
+	//D3D12_CPU_DESCRIPTOR_HANDLE		_rtvHandle[SWAP_CHAIN_BUFFER_COUNT];
 
 	uint32	_backBufferIndex = 0;	//현재의 back buffer를 알려줌.
 };

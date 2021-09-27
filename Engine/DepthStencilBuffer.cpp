@@ -8,7 +8,7 @@ void DepthStencilBuffer::Init(const WindowInfo& window, DXGI_FORMAT dsvFormat)
 
 	D3D12_HEAP_PROPERTIES heapProperty = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-	// 어떤 리소스 생성할 것인지 결정
+	// 어떤 리소스 생성할 것인지 결정 (Texture를 이용)
 	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Tex2D(_dsvFormat, window.width, window.height);
 	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;	// Stencil용도로 사용한다는 플래그
 

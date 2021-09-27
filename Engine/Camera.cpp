@@ -6,6 +6,8 @@
 #include "GameObject.h"
 #include "MeshRenderer.h"
 #include "Engine.h"
+#include "Material.h"
+#include "Shader.h"
 
 //static 변수 정의
 Matrix Camera::S_MatView;
@@ -37,26 +39,23 @@ void Camera::FinalUpdate()
 	_frustum.FinalUpdate();
 }
 
-void Camera::Render()
+void Camera::SortGameObject()
 {
-	S_MatView = _matView;
-	S_MatProjection = _matProjection;
-
 	shared_ptr<Scene> scene = GET_SINGLE(SceneManager)->GetActiveScene();
+	const vector<shared_ptr<GameObject>>& gameObjects = scene->GetGameObjects();
 
-	// Layer 구분
-	const vector<shared_ptr<GameObject>>& gameobjects = scene->GetGameObjects();
+	_vecDeferred.clear();
+	_vecForward.clear();
 
-	for (auto& gameObject : gameobjects)
+	for (auto& gameObject : gameObjects)
 	{
 		if (gameObject->GetMeshRenderer() == nullptr)
 			continue;
 
-		// 자신이 찍고 있는 layer인가를 구분
 		if (IsCulled(gameObject->GetLayerIndex()))
 			continue;
 
-		if (gameObject->GetCheckFrustum())	// 절두체 컬링을 허용하는 오브젝트인가?
+		if (gameObject->GetCheckFrustum())
 		{
 			if (_frustum.ContainSphere(
 				gameObject->GetTransform()->GetWorldPosition(),
@@ -66,6 +65,66 @@ void Camera::Render()
 			}
 		}
 
-		gameObject->GetMeshRenderer()->Render();
+		SHADER_TYPE shaderType = gameObject->GetMeshRenderer()->GetMaterial()->GetShader()->GetShaderType();
+		switch (shaderType)
+		{
+		case SHADER_TYPE::DEFERRED:
+			_vecDeferred.emplace_back(gameObject);
+			break;
+		case SHADER_TYPE::FORWARD:
+			_vecForward.emplace_back(gameObject);
+			break;
+		}
 	}
 }
+
+void Camera::Render_Deferred()
+{
+	S_MatView = _matView;
+	S_MatProjection = _matProjection;
+
+	for (auto& gameObject : _vecDeferred)
+		gameObject->GetMeshRenderer()->Render();
+}
+
+void Camera::Render_Forward()
+{
+	S_MatView = _matView;
+	S_MatProjection = _matProjection;
+
+	for (auto& gameObject : _vecForward)
+		gameObject->GetMeshRenderer()->Render();
+}
+
+//void Camera::Render()
+//{
+//	S_MatView = _matView;
+//	S_MatProjection = _matProjection;
+//
+//	shared_ptr<Scene> scene = GET_SINGLE(SceneManager)->GetActiveScene();
+//
+//	// Layer 구분
+//	const vector<shared_ptr<GameObject>>& gameobjects = scene->GetGameObjects();
+//
+//	for (auto& gameObject : gameobjects)
+//	{
+//		if (gameObject->GetMeshRenderer() == nullptr)
+//			continue;
+//
+//		// 자신이 찍고 있는 layer인가를 구분
+//		if (IsCulled(gameObject->GetLayerIndex()))
+//			continue;
+//
+//		if (gameObject->GetCheckFrustum())	// 절두체 컬링을 허용하는 오브젝트인가?
+//		{
+//			if (_frustum.ContainSphere(
+//				gameObject->GetTransform()->GetWorldPosition(),
+//				gameObject->GetTransform()->GetBoundingSphereRadius()) == false)
+//			{
+//				continue;
+//			}
+//		}
+//
+//		gameObject->GetMeshRenderer()->Render();
+//	}
+//}

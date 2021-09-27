@@ -57,9 +57,11 @@ void CommandQueue::RenderBegin(const D3D12_VIEWPORT* vp, const D3D12_RECT* rect)
 	_cmdAlloc->Reset();
 	_cmdList->Reset(_cmdAlloc.Get(), nullptr);
 
+	int8 backIndex = _swapChain->GetBackBufferIndex();
+
 	// Buffer들이 스왑되는 용도
 	D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		_swapChain->GetBackRTVBuffer().Get(),
+		GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->GetRTTexture(backIndex)->GetTex2D().Get(),
 		D3D12_RESOURCE_STATE_PRESENT, // 화면 출력
 		D3D12_RESOURCE_STATE_RENDER_TARGET); // 일 처리 결과물
 		
@@ -82,25 +84,28 @@ void CommandQueue::RenderBegin(const D3D12_VIEWPORT* vp, const D3D12_RECT* rect)
 	_cmdList->RSSetViewports(1, vp);
 	_cmdList->RSSetScissorRects(1, rect);
 
-	// 어떤 Buffer에 그림을 그릴 것인지를 구체적으로 정함.
-	// GPU에게 BackBuffer가 무엇인지 전해줌.
-	D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = _swapChain->GetBackRTV();
-	_cmdList->ClearRenderTargetView(backBufferView, Colors::Black, 0, nullptr);
+	//[[이제 여기서 수행하지 않음.]]
+	//// 어떤 Buffer에 그림을 그릴 것인지를 구체적으로 정함.
+	//// GPU에게 BackBuffer가 무엇인지 전해줌.
+	//D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = _swapChain->GetBackRTV();
+	//_cmdList->ClearRenderTargetView(backBufferView, Colors::Black, 0, nullptr);
 
-	//Depth Stencil Buffer의 핸들을 가져와서 OM(Out Merger)단계에서 사용.
-	D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = GEngine->GetDepthStencilBuffer()->getDSVCpuHandle();
-	_cmdList->OMSetRenderTargets(1, &backBufferView, FALSE, &depthStencilView);
+	////Depth Stencil Buffer의 핸들을 가져와서 OM(Out Merger)단계에서 사용.
+	//D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = GEngine->GetDepthStencilBuffer()->getDSVCpuHandle();
+	//_cmdList->OMSetRenderTargets(1, &backBufferView, FALSE, &depthStencilView);
 
-	//이후 Depth Stencil Buffer를 1로 초기화함.
-	_cmdList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	////이후 Depth Stencil Buffer를 1로 초기화함.
+	//_cmdList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void CommandQueue::RenderEnd()
 {
+	int8 backIndex = _swapChain->GetBackBufferIndex();
+
 	// BackBuffer를 현재 화면에 그려줌.
 	// 현재 화면을 BackBuffer로 바꿈.
 	D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		_swapChain->GetBackRTVBuffer().Get(),
+		GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->GetRTTexture(backIndex)->GetTex2D().Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, // 외주 결과물
 		D3D12_RESOURCE_STATE_PRESENT); // 화면 출력
 
