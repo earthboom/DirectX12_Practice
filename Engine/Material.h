@@ -7,9 +7,10 @@ class Texture;
 
 enum
 {
-	MATERIAL_INT_COUNT = 5,
-	MATERIAL_FLOAT_COUNT = 5,
-	MATERIAL_TEXTURE_COUNT = 5,
+	MATERIAL_INT_COUNT = 4,
+	MATERIAL_FLOAT_COUNT = 4,
+	MATERIAL_TEXTURE_COUNT = 4,
+	MATERIAL_VECTOR2_COUNT = 4,
 };
 
 struct MaterialParams
@@ -17,10 +18,12 @@ struct MaterialParams
 	void SetInt(uint8 index, int32 value) { intParams[index] = value; }
 	void SetFloat(uint8 index, float value) { floatParams[index] = value; }
 	void SetTexOn(uint8 index, int32 value) { texOnParams[index] = value; }
+	void SetVec2(uint8 index, Vec2 value) { vec2Params[index] = value; }
 
 	array<int32, MATERIAL_INT_COUNT> intParams;	//기존 배열과 다르게 범위 체크, vector와 유사, 고정된 크기
 	array<float, MATERIAL_FLOAT_COUNT> floatParams;
 	array<int32, MATERIAL_TEXTURE_COUNT> texOnParams;	//텍스처를 사용하는지 확인하는 값
+	array<Vec2, MATERIAL_TEXTURE_COUNT> vec2Params;
 };
 
 class Material : public Object
@@ -39,6 +42,8 @@ public:
 		_textures[index] = texture; 
 		_params.SetTexOn(index, (texture == nullptr ? 0 : 1));
 	}
+
+	void SetVec2(uint8 index, Vec2 value) { _params.SetVec2(index, value); }
 
 	void PushData();
 

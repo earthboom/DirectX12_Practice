@@ -11,12 +11,12 @@ Shader::~Shader()
 {
 }
 
-void Shader::Init(const wstring& path, ShaderInfo info)
+void Shader::Init(const wstring& path, ShaderInfo info, const string& vs, const string& ps)
 {
 	_info = info;
 
-	CreateVertexShader(path, "VS_Main", "vs_5_0");
-	CreatePixelShader(path, "PS_Main", "ps_5_0");
+	CreateVertexShader(path, vs, "vs_5_0");
+	CreatePixelShader(path, ps, "ps_5_0");
 
 	D3D12_INPUT_ELEMENT_DESC desc[] =
 	{
@@ -51,6 +51,11 @@ void Shader::Init(const wstring& path, ShaderInfo info)
 		_pipelineDesc.NumRenderTargets = 1;
 		_pipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		break;	
+	case SHADER_TYPE::LIGHTING:
+		_pipelineDesc.NumRenderTargets = 2;
+		_pipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		_pipelineDesc.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
 	}
 
 	switch (info.rasterizerType)
@@ -90,6 +95,48 @@ void Shader::Init(const wstring& path, ShaderInfo info)
 	case DEPTH_STENCIL_TYPE::GREATER_EQUAL:
 		_pipelineDesc.DepthStencilState.DepthEnable = TRUE;
 		_pipelineDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+		break;
+	case DEPTH_STENCIL_TYPE::NO_DEPTH_TEST:	// 깊이 테스트 X, 깊이 기록 O
+		_pipelineDesc.DepthStencilState.DepthEnable = FALSE;
+		_pipelineDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		break;
+	case DEPTH_STENCIL_TYPE::NO_DEPTH_TEST_NO_WRITE: // 깊이 테스트 O, 깊이 기록 X
+		_pipelineDesc.DepthStencilState.DepthEnable = FALSE;
+		_pipelineDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		break;
+	case DEPTH_STENCIL_TYPE::LESS_NO_WRITE: // 깊이 테스트 O, 깊이 기록 X
+		_pipelineDesc.DepthStencilState.DepthEnable = TRUE;
+		_pipelineDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		_pipelineDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		break;
+	}
+
+	// DirectX12에서 최대 넘겨줄 수 있는 RenderTarget은 8개
+	D3D12_RENDER_TARGET_BLEND_DESC& rt = _pipelineDesc.BlendState.RenderTarget[0];
+
+	// BlendEnable : 섞는 것에 대한 판단
+	// LogicOpEnable : 
+	// SrcBlend = Pixel Shader
+	// DestBlend = Render Target
+	switch (info.blendType)
+	{
+	case BLEND_TYPE::DEFAULT:
+		rt.BlendEnable = FALSE;
+		rt.LogicOpEnable = FALSE;
+		rt.SrcBlend = D3D12_BLEND_ONE;
+		rt.DestBlend = D3D12_BLEND_ZERO;
+		break;
+	case BLEND_TYPE::ALPHA_BLEND:
+		rt.BlendEnable = TRUE;
+		rt.LogicOpEnable = FALSE;
+		rt.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		rt.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+		break;
+	case BLEND_TYPE::ONE_TO_ONE_BLEND:
+		rt.BlendEnable = TRUE;
+		rt.LogicOpEnable = FALSE;
+		rt.SrcBlend = D3D12_BLEND_ONE;
+		rt.DestBlend = D3D12_BLEND_ONE;
 		break;
 	}
 
