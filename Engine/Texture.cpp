@@ -64,7 +64,7 @@ void Texture::Load(const wstring& path)
 		static_cast<unsigned int>(subResources.size()),
 		subResources.data());
 
-	GEngine->GetCmdQueue()->FlushResourceCommandQueue();
+	GEngine->GetGraphicsCmdQueue()->FlushResourceCommandQueue();
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.NumDescriptors = 1;
@@ -91,6 +91,8 @@ void Texture::Create(DXGI_FORMAT format, uint32 width, uint32 height,
 	desc.Flags = resFlags;
 
 	D3D12_CLEAR_VALUE optimizedClearValue = {};
+	D3D12_CLEAR_VALUE* pOptimizedClearValue = nullptr;
+
 	D3D12_RESOURCE_STATES resourceStates = D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_COMMON;
 
 	//resFlags를 통해서 이 Teexture를 어떤 용도로 사용할 것인지 정함.
@@ -98,12 +100,14 @@ void Texture::Create(DXGI_FORMAT format, uint32 width, uint32 height,
 	{
 		resourceStates = D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_DEPTH_WRITE;
 		optimizedClearValue = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.0f, 0);
+		pOptimizedClearValue = &optimizedClearValue;
 	}
 	else if (resFlags & D3D12_RESOURCE_FLAGS::D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET)
 	{
 		resourceStates = D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_COMMON;
 		float arrFloat[4] = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
 		optimizedClearValue = CD3DX12_CLEAR_VALUE(format, arrFloat);
+		pOptimizedClearValue = &optimizedClearValue;
 	}
 
 	// Create Texture2D
@@ -112,7 +116,7 @@ void Texture::Create(DXGI_FORMAT format, uint32 width, uint32 height,
 		heapFlags,
 		&desc,
 		resourceStates,
-		&optimizedClearValue,
+		pOptimizedClearValue,
 		IID_PPV_ARGS(&_tex2D));
 
 	assert(SUCCEEDED(hr));
@@ -159,6 +163,25 @@ void Texture::CreateFromResource(ComPtr<ID3D12Resource> tex2D)
 			DEVICE->CreateRenderTargetView(_tex2D.Get(), nullptr, rtvHeapBegin);
 		}
 
+		if (desc.Flags & D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)
+		{
+			// UAV
+			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			heapDesc.NumDescriptors = 1;
+			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+			heapDesc.NodeMask = 0;
+			DEVICE->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&_uavHeap));
+
+			_uavHandleBegin = _uavHeap->GetCPUDescriptorHandleForHeapStart();
+
+			D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+			uavDesc.Format = _image.GetMetadata().format;
+			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+
+			DEVICE->CreateUnorderedAccessView(_tex2D.Get(), nullptr, &uavDesc, _uavHandleBegin);
+		}
+		
 		// SRV
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 		srvHeapDesc.NumDescriptors = 1;

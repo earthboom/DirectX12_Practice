@@ -25,8 +25,10 @@ public:
 	ComPtr<ID3D12DescriptorHeap> GetSRV() { return _srvHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetRTV() { return _rtvHeap; }
 	ComPtr<ID3D12DescriptorHeap> GetDSV() { return _dsvHeap; }
+	ComPtr<ID3D12DescriptorHeap> GetUAV() { return _uavHeap; }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVHandle() { return _srvHandleBegin; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetUAVHandle() { return _uavHandleBegin; }
 
 private:
 	ScratchImage					_image;
@@ -35,8 +37,10 @@ private:
 	ComPtr<ID3D12DescriptorHeap>	_srvHeap;	//텍스처는 view를 하나만 만들어도 충분
 	ComPtr<ID3D12DescriptorHeap>	_rtvHeap;
 	ComPtr<ID3D12DescriptorHeap>	_dsvHeap;
+	ComPtr<ID3D12DescriptorHeap>	_uavHeap;
 
 private:
 	D3D12_CPU_DESCRIPTOR_HANDLE		_srvHandleBegin = {};
+	D3D12_CPU_DESCRIPTOR_HANDLE		_uavHandleBegin = {};
 };
 

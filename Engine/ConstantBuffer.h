@@ -23,8 +23,9 @@ public:
 	
 	void Clear();
 
-	void PushData(void* buffer, uint32 size);	//글로벌 데이터(한 번만 세팅하면 됨)
-	void SetGlobalData(void* buffer, uint32 size);	//b0 를 세팅하기 위함 (글로벌 데이터)
+	void PushGraphicsData(void* buffer, uint32 size);	//글로벌 데이터(한 번만 세팅하면 됨)	
+	void SetGraphicsGlobalData(void* buffer, uint32 size);	//b0 를 세팅하기 위함 (글로벌 데이터)
+	void PushComputeData(void* buffer, uint32 size);
 
 	D3D12_GPU_VIRTUAL_ADDRESS	GetGpuVirtualAddress(uint32 index);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuHande(uint32 index);

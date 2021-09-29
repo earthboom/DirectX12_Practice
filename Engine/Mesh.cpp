@@ -21,20 +21,20 @@ void Mesh::Init(const vector<Vertex>& vertexBuffer, const vector<uint32>& indexB
 // Redner Begin과 End 사이에서 실행
 void Mesh::Render()
 {
-	CMD_LIST->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);	// 정점들의 연결 형태
-	CMD_LIST->IASetVertexBuffers(0, 1, &_vertexBufferView); // Slot: (0~15) vertex
-	CMD_LIST->IASetIndexBuffer(&_indexBufferView);	//인덱스 버퍼 뷰 사용
+	GRAPHICS_CMD_LIST->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);	// 정점들의 연결 형태
+	GRAPHICS_CMD_LIST->IASetVertexBuffers(0, 1, &_vertexBufferView); // Slot: (0~15) vertex
+	GRAPHICS_CMD_LIST->IASetIndexBuffer(&_indexBufferView);	//인덱스 버퍼 뷰 사용
 
 	// 1) Buffer에다가 데이터 세팅
 	// 2) Table Descriptor Heap에다가 CBV 전달
 	// 3) 모든 세팅이 끝나면, Table Decriptor Heap을 커밋
 
 	// GPU register에 있는 Table로 전송
-	GEngine->GetTableDescHeap()->CommitTable();
+	GEngine->GetGraphicsDescHeap()->CommitTable();
 
 	// Input Assembler(IA) 단계에 Vertex, Index정보를 전달하는 단계
 	//CMD_LIST->DrawInstanced(_vertexCount, 1, 0, 0);	// 예약하는 것에 가깝고, RenderEnd에서 실행, Vertex만 이용
-	CMD_LIST->DrawIndexedInstanced(_indexCount, 1, 0, 0, 0);	//index 를 이용해 그리는 방식. (훨씬 효율적!)
+	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_indexCount, 1, 0, 0, 0);	//index 를 이용해 그리는 방식. (훨씬 효율적!)
 }
 
 void Mesh::CreateVertexBuffer(const vector<Vertex>& buffer)

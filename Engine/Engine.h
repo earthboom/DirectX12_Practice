@@ -22,10 +22,13 @@ public:
 	const WindowInfo& GetWindow() { return _window; }
 
 	shared_ptr<Device> GetDevice() { return _device; }
-	shared_ptr<CommandQueue> GetCmdQueue() { return _cmdQueue; }
+	shared_ptr<GraphicsCommandQueue> GetGraphicsCmdQueue() { return _graphicsCmdQueue; }
+	shared_ptr<ComputeCommandQueue> GetComputeCmdQueue() { return _computeCmdQueue; }
 	shared_ptr<SwapChain> GetSwapChain() { return _swapChain; }
 	shared_ptr<RootSignature> GetRootSignature() { return _rootSignature; }
-	shared_ptr<TableDescriptorHeap> GetTableDescHeap() { return _tableDescHeap; }
+	shared_ptr<GraphicsDescriptorHeap> GetGraphicsDescHeap() { return _graphicsDescHeap; }
+	shared_ptr<ComputeDescriptorHeap> GetComputeDescHeap() { return _computeDescHeap; }
+
 	//shared_ptr<DepthStencilBuffer> GetDepthStencilBuffer() { return _depthStencilBuffer; }
 
 	shared_ptr<ConstantBuffer> GetConstantBuffer(CONSTANT_BUFFER_TYPE type) { return _constantBuffers[static_cast<uint8>(type)]; }
@@ -51,10 +54,13 @@ private:
 
 	// 임시적(편리)를 위해, 헤더에서 할당(나중에 구조 변경 때, 수정)
 	shared_ptr<Device> _device = make_shared<Device>();	//GPU 접근, 요청 (가장 핵심)
-	shared_ptr<CommandQueue> _cmdQueue = make_shared<CommandQueue>();	//GPU에 일을 요청할 때, 일을 한 번에 모아서 전달하는 역할
+	shared_ptr<GraphicsCommandQueue> _graphicsCmdQueue = make_shared<GraphicsCommandQueue>();	//GPU에 일을 요청할 때, 일을 한 번에 모아서 전달하는 역할
+	shared_ptr<ComputeCommandQueue> _computeCmdQueue = make_shared<ComputeCommandQueue>();
 	shared_ptr<SwapChain> _swapChain = make_shared<SwapChain>();	//더블 버퍼 용, 화면을 그리고 준비하는 두 버퍼를 교체하는 역할	
 	shared_ptr<RootSignature> _rootSignature = make_shared<RootSignature>();
-	shared_ptr<TableDescriptorHeap> _tableDescHeap = make_shared<TableDescriptorHeap>();
+	shared_ptr<GraphicsDescriptorHeap> _graphicsDescHeap = make_shared<GraphicsDescriptorHeap>();
+	shared_ptr<ComputeDescriptorHeap> _computeDescHeap = make_shared<ComputeDescriptorHeap>();
+
 	//shared_ptr<DepthStencilBuffer> _depthStencilBuffer = make_shared<DepthStencilBuffer>();
 
 	vector<shared_ptr<ConstantBuffer>> _constantBuffers;

@@ -82,7 +82,7 @@ void ConstantBuffer::Clear()
 }
 
 //Data를 넣은 핸들의 위치를 반환해준다.
-void ConstantBuffer::PushData(void* buffer, uint32 size)
+void ConstantBuffer::PushGraphicsData(void* buffer, uint32 size)
 {
 	assert(_currentIndex < _elementCount); //현재의 인덱스가 할당해준 버퍼 수를 넘어갈 경우
 	assert(_elementSize == ((size + 255) & ~255));
@@ -95,16 +95,30 @@ void ConstantBuffer::PushData(void* buffer, uint32 size)
 
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = GetCpuHande(_currentIndex);
 
-	GEngine->GetTableDescHeap()->SetCBV(cpuHandle, _reg);
+	GEngine->GetGraphicsDescHeap()->SetCBV(cpuHandle, _reg);
 
-	_currentIndex++;
+	++_currentIndex;
 }
 
-void ConstantBuffer::SetGlobalData(void* buffer, uint32 size)
+void ConstantBuffer::SetGraphicsGlobalData(void* buffer, uint32 size)
 {
 	assert(_elementSize == ((size + 255) & ~255));
 	::memcpy(&_mappedBuffer[0], buffer, size);	// index 0 의 buffer data를 저장
-	CMD_LIST->SetGraphicsRootConstantBufferView(0, GetGpuVirtualAddress(0));
+	GRAPHICS_CMD_LIST->SetGraphicsRootConstantBufferView(0, GetGpuVirtualAddress(0));
+}
+
+void ConstantBuffer::PushComputeData(void* buffer, uint32 size)
+{
+	assert(_currentIndex < _elementCount); //현재의 인덱스가 할당해준 버퍼 수를 넘어갈 경우
+	assert(_elementSize == ((size + 255) & ~255));
+
+	// 해당 버퍼 위치에 복사
+	::memcpy(&_mappedBuffer[_currentIndex * _elementSize], buffer, size);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = GetCpuHande(_currentIndex);
+	GEngine->GetComputeDescHeap()->SetCBV(cpuHandle, _reg);
+
+	++_currentIndex;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGpuVirtualAddress(uint32 index)
