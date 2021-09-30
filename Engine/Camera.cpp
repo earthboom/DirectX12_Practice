@@ -8,6 +8,7 @@
 #include "Engine.h"
 #include "Material.h"
 #include "Shader.h"
+#include "ParticleSystem.h"
 
 //static 변수 정의
 Matrix Camera::S_MatView;
@@ -46,10 +47,11 @@ void Camera::SortGameObject()
 
 	_vecDeferred.clear();
 	_vecForward.clear();
+	_vecParticle.clear();
 
 	for (auto& gameObject : gameObjects)
 	{
-		if (gameObject->GetMeshRenderer() == nullptr)
+		if (gameObject->GetMeshRenderer() == nullptr && gameObject->GetParticleSystem() == nullptr)
 			continue;
 
 		if (IsCulled(gameObject->GetLayerIndex()))
@@ -65,16 +67,25 @@ void Camera::SortGameObject()
 			}
 		}
 
-		SHADER_TYPE shaderType = gameObject->GetMeshRenderer()->GetMaterial()->GetShader()->GetShaderType();
-		switch (shaderType)
+		if (gameObject->GetMeshRenderer())
 		{
-		case SHADER_TYPE::DEFERRED:
-			_vecDeferred.emplace_back(gameObject);
-			break;
-		case SHADER_TYPE::FORWARD:
-			_vecForward.emplace_back(gameObject);
-			break;
+			// 일반적인 forward, deferred render
+			SHADER_TYPE shaderType = gameObject->GetMeshRenderer()->GetMaterial()->GetShader()->GetShaderType();
+			switch (shaderType)
+			{
+			case SHADER_TYPE::DEFERRED:
+				_vecDeferred.emplace_back(gameObject);
+				break;
+			case SHADER_TYPE::FORWARD:
+				_vecForward.emplace_back(gameObject);
+				break;
+			}
 		}
+		else
+		{
+			// 일반적인 particle
+			_vecParticle.emplace_back(gameObject);
+		}		
 	}
 }
 
@@ -94,6 +105,10 @@ void Camera::Render_Forward()
 
 	for (auto& gameObject : _vecForward)
 		gameObject->GetMeshRenderer()->Render();
+
+	// particle render
+	for (auto& gameObject : _vecParticle)
+		gameObject->GetParticleSystem()->Render();
 }
 
 //void Camera::Render()

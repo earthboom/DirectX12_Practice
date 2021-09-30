@@ -8,6 +8,7 @@ enum class COMPONENT_TYPE : uint8
 	MESH_RENDERER,
 	CAMERA,
 	LIGHT,
+	PARTICLE_SYSTEM,
 	//......
 	MONO_BEHAVIOUR,	// 여러 개를 가질 수 있다.
 	END

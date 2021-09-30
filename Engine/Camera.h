@@ -57,6 +57,7 @@ private:
 	// 그려줄 물체들을 Deferred, Forward 구분하여 저장해 둠
 	vector<shared_ptr<GameObject>> _vecDeferred;
 	vector<shared_ptr<GameObject>> _vecForward;
+	vector<shared_ptr<GameObject>> _vecParticle;	// particle은 별도로 봄
 
 public:
 	//Temp

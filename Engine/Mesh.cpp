@@ -19,9 +19,9 @@ void Mesh::Init(const vector<Vertex>& vertexBuffer, const vector<uint32>& indexB
 }
 
 // Redner Begin과 End 사이에서 실행
-void Mesh::Render()
+void Mesh::Render(uint32 instanceCount)
 {
-	GRAPHICS_CMD_LIST->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);	// 정점들의 연결 형태
+	//GRAPHICS_CMD_LIST->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);	// 정점들의 연결 형태
 	GRAPHICS_CMD_LIST->IASetVertexBuffers(0, 1, &_vertexBufferView); // Slot: (0~15) vertex
 	GRAPHICS_CMD_LIST->IASetIndexBuffer(&_indexBufferView);	//인덱스 버퍼 뷰 사용
 
@@ -34,7 +34,9 @@ void Mesh::Render()
 
 	// Input Assembler(IA) 단계에 Vertex, Index정보를 전달하는 단계
 	//CMD_LIST->DrawInstanced(_vertexCount, 1, 0, 0);	// 예약하는 것에 가깝고, RenderEnd에서 실행, Vertex만 이용
-	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_indexCount, 1, 0, 0, 0);	//index 를 이용해 그리는 방식. (훨씬 효율적!)
+	
+	// Instancing 기술 활용 ( Draw 콜을 줄임 )
+	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);	//index 를 이용해 그리는 방식. (훨씬 효율적!)
 }
 
 void Mesh::CreateVertexBuffer(const vector<Vertex>& buffer)
