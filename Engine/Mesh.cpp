@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Engine.h"
 #include "Material.h"
+#include "InstancingBuffer.h"
 
 Mesh::Mesh()
 	: Object(OBJECT_TYPE::MESH)
@@ -37,6 +38,17 @@ void Mesh::Render(uint32 instanceCount)
 	
 	// Instancing 기술 활용 ( Draw 콜을 줄임 )
 	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);	//index 를 이용해 그리는 방식. (훨씬 효율적!)
+}
+
+void Mesh::Render(shared_ptr<class InstancingBuffer>& buffer)
+{
+	D3D12_VERTEX_BUFFER_VIEW bufferView[] = { _vertexBufferView, buffer->GetBufferView() };
+	GRAPHICS_CMD_LIST->IASetVertexBuffers(0, 2, bufferView);
+	GRAPHICS_CMD_LIST->IASetIndexBuffer(&_indexBufferView);
+
+	GEngine->GetGraphicsDescHeap()->CommitTable();
+
+	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_indexCount, buffer->GetCount(), 0, 0, 0);
 }
 
 void Mesh::CreateVertexBuffer(const vector<Vertex>& buffer)

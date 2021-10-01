@@ -148,11 +148,12 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 #pragma endregion
 
 #pragma region Object
+	for (int32 i = 0; i < 50; ++i)
 	{
 		shared_ptr<GameObject> obj = make_shared<GameObject>();
 		obj->AddComponent(make_shared<Transform>());
-		obj->GetTransform()->SetLocalScale(Vec3(100.0f, 100.0f, 100.0f));
-		obj->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 150.0f));
+		obj->GetTransform()->SetLocalScale(Vec3(25.0f, 25.0f, 25.0f));
+		obj->GetTransform()->SetLocalPosition(Vec3(-300.0f + i * 10.0f, 0.0f, 500.0f));
 
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
 		{
@@ -160,18 +161,16 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 			meshRenderer->SetMesh(sphereMesh);
 		}
 		{
-			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Substance", L"..\\Resources\\Texture\\Substance.jpg");
-			shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Substance_Normal", L"..\\Resources\\Texture\\Substance_Normal.jpg");			
-			shared_ptr<Material> material = make_shared<Material>();
-			material->SetShader(shader);
-			material->SetTexture(0, texture);
-			material->SetTexture(1, texture2);
+			shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"GameObject");
+			material->SetInt(0, 1);
 			meshRenderer->SetMaterial(material);
+
+			//material->SetInt(0, 0);
+			//meshRenderer->SetMaterial(material->Clone());
 		}
 		obj->AddComponent(meshRenderer);
 		scene->AddGameObject(obj);
-	}
+	}	
 #pragma endregion
 
 #pragma region UI_Test
@@ -216,7 +215,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		light->AddComponent(make_shared<Light>());
 		light->GetLight()->SetLightDirection(Vec3(0, 0, 1.f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
-		light->GetLight()->SetDiffuse(Vec3(1.f, 0.f, 0.f));
+		light->GetLight()->SetDiffuse(Vec3(1.0f, 1.0f, 1.0f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.2f, 0.2f, 0.2f));
 
@@ -259,16 +258,16 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 //	}
 //#pragma endregion
 
-#pragma region ParticleSystem
-	{
-		shared_ptr<GameObject> particle = make_shared<GameObject>();
-		particle->AddComponent(make_shared<Transform>());
-		particle->AddComponent(make_shared<ParticleSystem>());
-		particle->SetCheckFrustum(false);
-		particle->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 100.0f));
-		scene->AddGameObject(particle);
-	}
-#pragma endregion
+//#pragma region ParticleSystem
+//	{
+//		shared_ptr<GameObject> particle = make_shared<GameObject>();
+//		particle->AddComponent(make_shared<Transform>());
+//		particle->AddComponent(make_shared<ParticleSystem>());
+//		particle->SetCheckFrustum(false);
+//		particle->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 100.0f));
+//		scene->AddGameObject(particle);
+//	}
+//#pragma endregion
 
 	return scene;
 }

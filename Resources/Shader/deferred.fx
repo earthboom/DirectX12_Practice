@@ -9,6 +9,11 @@ struct VS_IN
     float2 uv : TEXCOORD;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
+
+    row_major matrix matWorld : W;
+    row_major matrix matWV : WV;
+    row_major matrix matWVP : WVP;
+    uint instancID : SV_InstanceID; // Instance ID를 지정
 };
 
 struct VS_OUT
@@ -26,14 +31,28 @@ VS_OUT VS_Main(VS_IN input)
 {
     VS_OUT output = (VS_OUT)0;
 
-    output.pos = mul(float4(input.pos, 1.0f), g_matWVP);    // 투영 좌표계까지
-    output.uv = input.uv;
+    if (g_int_0 == 1)    // Instance를 의미
+    {
+        output.pos = mul(float4(input.pos, 1.0f), input.matWVP);
+        output.uv = input.uv;
 
-    output.viewPos = mul(float4(input.pos, 1.0f), g_matWV).xyz; //(위치라서 w값을 1로)
-    output.viewNormal = normalize(mul(float4(input.normal, 0.0f), g_matWV).xyz);    //(방향을 위해서 0으로)
-    
-    output.viewTangent = normalize(mul(float4(input.tangent, 0.0f), g_matWV).xyz);  // tangent 계산(Normal mapping을 위함)
-    output.viewBinormal = normalize(cross(output.viewTangent, output.viewNormal));
+        output.viewPos = mul(float4(input.pos, 1.0f), input.matWV).xyz; //(위치라서 w값을 1로)
+        output.viewNormal = normalize(mul(float4(input.normal, 0.0f), input.matWV).xyz);    //(방향을 위해서 0으로)
+
+        output.viewTangent = normalize(mul(float4(input.tangent, 0.0f), input.matWV).xyz);  // tangent 계산(Normal mapping을 위함)
+        output.viewBinormal = normalize(cross(output.viewTangent, output.viewNormal));
+    }
+    else
+    {
+        output.pos = mul(float4(input.pos, 1.0f), g_matWVP);    // 투영 좌표계까지
+        output.uv = input.uv;
+
+        output.viewPos = mul(float4(input.pos, 1.0f), g_matWV).xyz; //(위치라서 w값을 1로)
+        output.viewNormal = normalize(mul(float4(input.normal, 0.0f), g_matWV).xyz);    //(방향을 위해서 0으로)
+
+        output.viewTangent = normalize(mul(float4(input.tangent, 0.0f), g_matWV).xyz);  // tangent 계산(Normal mapping을 위함)
+        output.viewBinormal = normalize(cross(output.viewTangent, output.viewNormal));
+    }
 
     return output;
 }

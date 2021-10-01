@@ -9,6 +9,7 @@
 #include "Material.h"
 #include "Shader.h"
 #include "ParticleSystem.h"
+#include "InstancingManager.h"
 
 //static 변수 정의
 Matrix Camera::S_MatView;
@@ -94,8 +95,7 @@ void Camera::Render_Deferred()
 	S_MatView = _matView;
 	S_MatProjection = _matProjection;
 
-	for (auto& gameObject : _vecDeferred)
-		gameObject->GetMeshRenderer()->Render();
+	GET_SINGLE(InstancingManager)->Render(_vecDeferred);
 }
 
 void Camera::Render_Forward()
@@ -103,8 +103,7 @@ void Camera::Render_Forward()
 	S_MatView = _matView;
 	S_MatProjection = _matProjection;
 
-	for (auto& gameObject : _vecForward)
-		gameObject->GetMeshRenderer()->Render();
+	GET_SINGLE(InstancingManager)->Render(_vecForward);
 
 	// particle render
 	for (auto& gameObject : _vecParticle)
