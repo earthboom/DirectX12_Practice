@@ -55,7 +55,7 @@ void GraphicsCommandQueue::WaitSync()
 	}
 }
 
-void GraphicsCommandQueue::RenderBegin(const D3D12_VIEWPORT* vp, const D3D12_RECT* rect)
+void GraphicsCommandQueue::RenderBegin()
 {
 	//초기화.
 	_cmdAlloc->Reset();
@@ -83,10 +83,6 @@ void GraphicsCommandQueue::RenderBegin(const D3D12_VIEWPORT* vp, const D3D12_REC
 	_cmdList->SetDescriptorHeaps(1, &descHeap);	//프레임마다 한 번씩만 해주는 것이 좋다. (매우 무겁다)
 
 	_cmdList->ResourceBarrier(1, &barrier);
-
-	// Set the viewport and scissor rect.  This needs to be reset whenever the command list is reset.
-	_cmdList->RSSetViewports(1, vp);
-	_cmdList->RSSetScissorRects(1, rect);
 
 	//[[이제 여기서 수행하지 않음.]]
 	//// 어떤 Buffer에 그림을 그릴 것인지를 구체적으로 정함.

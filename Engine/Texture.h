@@ -30,8 +30,12 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVHandle() { return _srvHandleBegin; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetUAVHandle() { return _uavHandleBegin; }
 
+	float GetWidth() { return static_cast<float>(_desc.Width); }
+	float GetHeight() { return static_cast<float>(_desc.Height); }
+
 private:
 	ScratchImage					_image;
+	D3D12_RESOURCE_DESC				_desc;
 	ComPtr<ID3D12Resource>			_tex2D;
 
 	ComPtr<ID3D12DescriptorHeap>	_srvHeap;	//텍스처는 view를 하나만 만들어도 충분

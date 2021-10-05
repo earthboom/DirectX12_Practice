@@ -29,7 +29,7 @@ void Frustum::FinalUpdate()
 	_planes[PLANE_RIGHT]	= ::XMPlaneFromPoints(worldPos[5], worldPos[6], worldPos[1]);	//CCW
 }
 
-bool Frustum::ContainSphere(const Vec3& pos, float radius)
+bool Frustum::ContainsSphere(const Vec3& pos, float radius)
 {
 	// 기존에 쓰이는 BoundingFrusum 구조체 (키워드)
 

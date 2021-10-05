@@ -7,6 +7,7 @@
 enum class RENDER_TARGET_GROUP_TYPE : uint8
 {
 	SWAP_CHAIN,	// Back Buffer, Front Buffer 
+	SHADOW,		// Shadow
 	G_BUFFER,	// Position, Normal, Color (G Buffer는 Geometry Buffer를 의미)
 	LIGHTING,	// Diffuse Light, Specular Light
 	END,
@@ -14,6 +15,7 @@ enum class RENDER_TARGET_GROUP_TYPE : uint8
 
 enum
 {
+	RENDER_TARGET_SHADOW_GROUP_MEMBER_COUNT = 1,
 	RENDER_TARGET_G_BUFFER_GROUP_MEMBER_COUNT = 3,
 	RENDER_TARGET_LIGHTING_GROUP_MEMBER_COUNT = 2,
 	RENDER_TARGET_GROUP_COUNT = static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::END)

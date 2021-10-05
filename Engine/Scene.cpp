@@ -56,17 +56,53 @@ void Scene::Render()
 	// Light 세팅
 	PushLightData();
 
+	ClearRTV();	// RenderTargetView 초기화
+
+	RenderShadow();
+
+	RenderDeferred();
+
+	RenderLights();	// Lighting 관련 렌더
+
+	RenderFinal();
+
+	RenderForward();
+}
+
+void Scene::ClearRTV()
+{
 	//SwapChain Group 초기화
 	int8 backIndex = GEngine->GetSwapChain()->GetBackBufferIndex();
 	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->ClearRenderTargetView(backIndex);
+
+	//Shadow Group 초기화
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->ClearRenderTargetView();
 
 	//Deferred Group 초기화
 	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->ClearRenderTargetView();
 
 	//Lighting Group 초기화
 	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->ClearRenderTargetView();
+}
 
+void Scene::RenderShadow()
+{
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->OMSetRenderTargets();	// Setting
 
+	// Directional Light에 대해서만 그림자를 그림.
+	for (auto& light : _lights)
+	{
+		if (light->GetLightType() != LIGHT_TYPE::DIRECTIONAL_LIGHT)	
+			continue;
+
+		light->RenderShadow();
+	}
+
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->WaitTargetToResource();
+}
+
+void Scene::RenderDeferred()
+{
 	// Deferred OMSet
 	// G_BUFFER의 Render Target Texture의 데이터가 deferred.fx 의 PS_Main에서 연산됨.
 	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->OMSetRenderTargets();
@@ -77,12 +113,36 @@ void Scene::Render()
 	mainCamera->SortGameObject();	// Forward, Deferred 구분	
 	mainCamera->Render_Deferred();
 	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->WaitTargetToResource();
+}
 
-	RenderLights();	// Lighting 관련 렌더
+void Scene::RenderLights()
+{
+	shared_ptr<Camera> mainCamera = _cameras[0];	// main 카메라
+	Camera::S_MatView = mainCamera->GetViewMatrix();	// main 카메라의 view 행렬 
+	Camera::S_MatProjection = mainCamera->GetProjectionMatrix(); //  main 카메라의 Projection 행렬
+
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->OMSetRenderTargets();
+
+	// 광원 그리기
+	for (auto& light : _lights)
+		light->Render();
+
 	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->WaitTargetToResource();
+}
 
-	RenderFinal();	// 렌더타켓 취합
+void Scene::RenderFinal()
+{
+	// Swapchain OMSet
+	int8 backIndex = GEngine->GetSwapChain()->GetBackBufferIndex();
+	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->OMSetRenderTargets(1, backIndex);
 
+	GET_SINGLE(Resources)->Get<Material>(L"Final")->PushGraphicsData();	// 취합 과정
+	GET_SINGLE(Resources)->Get<Mesh>(L"Rectangle")->Render();
+}
+
+void Scene::RenderForward()
+{
+	shared_ptr<Camera> mainCamera = _cameras[0];
 	mainCamera->Render_Forward();
 
 	// 메인 카메라를 제외한 나머지 카메라는 Forward Render만 수행
@@ -94,25 +154,6 @@ void Scene::Render()
 		camera->SortGameObject();
 		camera->Render_Forward();
 	}
-}
-
-void Scene::RenderLights()
-{
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->OMSetRenderTargets();
-
-	// 광원 그리기
-	for (auto& light : _lights)
-		light->Render();
-}
-
-void Scene::RenderFinal()
-{
-	// Swapchain OMSet
-	int8 backIndex = GEngine->GetSwapChain()->GetBackBufferIndex();
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->OMSetRenderTargets(1, backIndex);
-
-	GET_SINGLE(Resources)->Get<Material>(L"Final")->PushGraphicsData();	// 취합 과정
-	GET_SINGLE(Resources)->Get<Mesh>(L"Rectangle")->Render();
 }
 
 void Scene::PushLightData()

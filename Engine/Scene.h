@@ -12,8 +12,15 @@ public:
 	void FinalUpdate();
 
 	void Render();
+
+	void ClearRTV();
+
+	void RenderShadow();	// Light 전에만 그려주면 됨.
+	void RenderDeferred();
 	void RenderLights();
 	void RenderFinal();
+
+	void RenderForward();
 
 private:
 	void PushLightData();

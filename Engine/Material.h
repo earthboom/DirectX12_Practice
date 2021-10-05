@@ -12,6 +12,7 @@ enum
 	MATERIAL_TEXTURE_COUNT = 4,
 	MATERIAL_VECTOR2_COUNT = 4,
 	MATERIAL_VECTOR4_COUNT = 4,
+	MATERIAL_MATRIX_COUNT = 4,
 };
 
 struct MaterialParams
@@ -21,12 +22,14 @@ struct MaterialParams
 	void SetTexOn(uint8 index, int32 value) { texOnParams[index] = value; }
 	void SetVec2(uint8 index, Vec2 value) { vec2Params[index] = value; }
 	void SetVec4(uint8 index, Vec4 value) { vec4Params[index] = value; }
+	void SetMatrix(uint8 index, Matrix& value) { matrixParams[index] = value; }
 
 	array<int32, MATERIAL_INT_COUNT> intParams;	//기존 배열과 다르게 범위 체크, vector와 유사, 고정된 크기
 	array<float, MATERIAL_FLOAT_COUNT> floatParams;
 	array<int32, MATERIAL_TEXTURE_COUNT> texOnParams;	//텍스처를 사용하는지 확인하는 값
-	array<Vec2, MATERIAL_TEXTURE_COUNT> vec2Params;
-	array<Vec4, MATERIAL_TEXTURE_COUNT> vec4Params;
+	array<Vec2, MATERIAL_VECTOR2_COUNT> vec2Params;
+	array<Vec4, MATERIAL_VECTOR4_COUNT> vec4Params;
+	array<Matrix, MATERIAL_MATRIX_COUNT> matrixParams;
 };
 
 class Material : public Object
@@ -48,6 +51,7 @@ public:
 
 	void SetVec2(uint8 index, Vec2 value) { _params.SetVec2(index, value); }
 	void SetVec4(uint8 index, Vec4 value) { _params.SetVec4(index, value); }
+	void SetMatrix(uint8 index, Matrix& value) { _params.SetMatrix(index, value); }
 
 	void PushGraphicsData();
 	void PushComputeData();

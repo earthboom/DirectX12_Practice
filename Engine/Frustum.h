@@ -17,7 +17,7 @@ class Frustum
 {
 public:
 	void FinalUpdate();
-	bool ContainSphere(const Vec3& pos, float radius);	// 구체 판별
+	bool ContainsSphere(const Vec3& pos, float radius);	// 구체 판별
 
 private:
 	array<Vec4, PLANE_END> _planes;

@@ -24,8 +24,10 @@ struct PS_OUT
 
 // Directional Light
 // g_int_0 : Light index
-// g_int_1 : Position RT
-// g_int_2 : Normal RT
+// g_tex_0 : Position RT
+// g_tex_1 : Normal RT
+// g_tex_2 : Shadow RT
+// g_mat_0 : ShadowCamera VP 
 // Mesh : Rectangle
 
 VS_OUT VS_DirLight(VS_IN input)
@@ -50,6 +52,33 @@ PS_OUT PS_DirLight(VS_OUT input)
 	float3 viewNormal = g_tex_1.Sample(g_sam_0, input.uv).xyz;
 
 	LightColor color = CalculateLightColor(g_int_0, viewNormal, viewPos);
+
+	// 그림자 적용해야 하는지를 판별.
+	if (length(color.diffuse) != 0)
+	{
+		matrix shadowCameraVP = g_mat_0;
+
+		float4 worldPos = mul(float4(viewPos.xyz, 1.0f), g_matViewInv); // World 좌표계 변환
+		float4 shadowClipPos = mul(worldPos, shadowCameraVP);	// 빛 기준의 카메라 Clip 좌표계 변환
+		float depth = shadowClipPos.z / shadowClipPos.w;	// w 나누기로 투영좌표계로 깊이값 추출
+
+		// x[-1 ~ 1] -> u[0 ~ 1]
+		// y[1 ~ -1] -> v[0 ~ 1]
+		float2 uv = shadowClipPos.xy / shadowClipPos.w;	// xy를 w로 나누어 투영좌표계 값을 추출
+		uv.y = -uv.y;
+		uv = uv * 0.5f + 0.5f;
+
+		if (0 < uv.x && uv.x < 1 && 0 < uv.y && uv.y < 1)
+		{
+			float shadowDepth = g_tex_2.Sample(g_sam_0, uv).x;
+			if (shadowDepth > 0 && depth > shadowDepth + 0.00001f)	// 오차 범위를 보정을 위한 추가값
+			{
+				color.diffuse *= 0.5f;
+				color.specular = (float4)0.0f;
+			}
+		}
+	}
+
 	output.diffuse = color.diffuse + color.ambient;
 	output.specular = color.specular;
 
