@@ -51,6 +51,14 @@ void Scene::FinalUpdate()
 	}
 }
 
+shared_ptr<class Camera> Scene::GetMainCamera()
+{
+	if (_cameras.empty())
+		return nullptr;
+
+	return _cameras[0];
+}
+
 void Scene::Render()
 {
 	// Light ¼¼ÆÃ

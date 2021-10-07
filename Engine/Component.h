@@ -9,6 +9,7 @@ enum class COMPONENT_TYPE : uint8
 	CAMERA,
 	LIGHT,
 	PARTICLE_SYSTEM,
+	TERRAIN,
 	//......
 	MONO_BEHAVIOUR,	// 여러 개를 가질 수 있다.
 	END

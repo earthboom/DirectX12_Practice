@@ -13,6 +13,7 @@
 #include "TestCameraScript.h"
 #include "Resources.h"
 #include "ParticleSystem.h"
+#include "Terrain.h"
 
 void SceneManager::Update()
 {
@@ -98,6 +99,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		camera->AddComponent(make_shared<Transform>());
 		camera->AddComponent(make_shared<Camera>()); // Near = 1, Far = 1000, FOV = 45도
 		camera->AddComponent(make_shared<TestCameraScript>());	//카메라 이동코드를 Component로 빼서 작업.
+		camera->GetCamera()->SetFar(10000.0f);
 		camera->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 0.0f));
 
 		uint8 layerIndex = GET_SINGLE(SceneManager)->LayerNameToIndex(L"UI");
@@ -169,25 +171,19 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 	}*/	
 #pragma endregion
 
-#pragma region Plane
+#pragma region Terrain
 	{
 		shared_ptr<GameObject> obj = make_shared<GameObject>();
 		obj->AddComponent(make_shared<Transform>());
-		obj->GetTransform()->SetLocalScale(Vec3(1000.0f, 1.0f, 1000.0f));
-		obj->GetTransform()->SetLocalPosition(Vec3(0.0f, -100.0f, 500.0f));
-		obj->SetStatic(true);
+		obj->AddComponent(make_shared<Terrain>());
+		obj->AddComponent(make_shared<MeshRenderer>());
 
-		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-		{
-			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadCubeMesh();
-			meshRenderer->SetMesh(mesh);
-		}
-		{
-			shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"GameObject")->Clone();
-			material->SetInt(0, 0);
-			meshRenderer->SetMaterial(material);
-		}
-		obj->AddComponent(meshRenderer);
+		obj->GetTransform()->SetLocalScale(Vec3(50.0f, 250.0f, 50.0f));
+		obj->GetTransform()->SetLocalPosition(Vec3(-100.0f, -200.0f, 300.0f));
+		obj->SetStatic(true);
+		obj->GetTerrain()->Init(64, 64);
+		obj->SetCheckFrustum(false);
+
 		scene->AddGameObject(obj);
 	}
 #pragma endregion
@@ -232,7 +228,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		light->AddComponent(make_shared<Transform>());
 		light->GetTransform()->SetLocalPosition(Vec3(0.0f, 1000.0f, 500.0f));
 		light->AddComponent(make_shared<Light>());
-		light->GetLight()->SetLightDirection(Vec3(0.0f, -1.0, 0.0f));
+		light->GetLight()->SetLightDirection(Vec3(0.0f, -1.0, 1.0f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
 		light->GetLight()->SetDiffuse(Vec3(1.0f, 1.0f, 1.0f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
@@ -242,25 +238,25 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 	}
 #pragma endregion
 
-#pragma region Tessellation Test
-	{
-		shared_ptr<GameObject> gameObject = make_shared<GameObject>();
-		gameObject->AddComponent(make_shared<Transform>());
-		gameObject->GetTransform()->SetLocalScale(Vec3(100.0f, 100.0f, 100.0f));
-		gameObject->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 300.0f));
-		gameObject->GetTransform()->SetLocalRotation(Vec3(0.0f, 0.0f, 0.0f));
-		gameObject->SetStatic(false);
-
-		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-		{
-			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
-			meshRenderer->SetMesh(mesh);
-			meshRenderer->SetMaterial(GET_SINGLE(Resources)->Get<Material>(L"Tessellation"));
-		}
-		gameObject->AddComponent(meshRenderer);
-		scene->AddGameObject(gameObject);
-	}
-#pragma endregion
+//#pragma region Tessellation Test
+//	{
+//		shared_ptr<GameObject> gameObject = make_shared<GameObject>();
+//		gameObject->AddComponent(make_shared<Transform>());
+//		gameObject->GetTransform()->SetLocalScale(Vec3(100.0f, 100.0f, 100.0f));
+//		gameObject->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 300.0f));
+//		gameObject->GetTransform()->SetLocalRotation(Vec3(0.0f, 0.0f, 0.0f));
+//		gameObject->SetStatic(false);
+//
+//		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+//		{
+//			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+//			meshRenderer->SetMesh(mesh);
+//			meshRenderer->SetMaterial(GET_SINGLE(Resources)->Get<Material>(L"Tessellation"));
+//		}
+//		gameObject->AddComponent(meshRenderer);
+//		scene->AddGameObject(gameObject);
+//	}
+//#pragma endregion
 
 //#pragma region Point Light
 //	{

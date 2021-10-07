@@ -82,4 +82,20 @@ float Rand(float2 co)
     return 0.5f + (frac(sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453)) * 0.5f;
 }
 
+float CalculateTessLevel(float3 cameraWorldPos, float patchPos, float min, float max, float maxLv)
+{
+    // patchPos : patch의 중앙위치
+    float distance = length(patchPos - cameraWorldPos); // 카메라와의 거리
+
+    if (distance < min)
+        return maxLv;
+    if (distance > max)
+        return 1.0f;
+
+    float ratio = (distance - min) / (max - min);
+    float level = (maxLv - 1.0f) * (1.0f - ratio);
+
+    return level;
+}
+
 #endif 
