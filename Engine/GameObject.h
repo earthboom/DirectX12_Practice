@@ -10,6 +10,7 @@ class Light;
 class MonoBehaviour;
 class ParticleSystem;
 class Terrain;
+class BaseCollider;
 
 //enable_shared_from_this는 자기 자신의 weak_ptr를 들고 있게하여, shared_from_this를 사용 가능.
 //자기 자신의 weak_ptr을 보내는 기능.
@@ -33,6 +34,7 @@ public:
 	shared_ptr<Light> GetLight();
 	shared_ptr<ParticleSystem> GetParticleSystem();
 	shared_ptr<Terrain> GetTerrain();
+	shared_ptr<BaseCollider> GetCollider();
 
 	void AddComponent(shared_ptr<Component> component);
 

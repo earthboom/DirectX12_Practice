@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Input.h"
+#include "Engine.h"
 
 void Input::Init(HWND hwnd)
 {
@@ -45,7 +46,11 @@ void Input::Update()
 			if (state == KEY_STATE::PRESS || state == KEY_STATE::DOWN)
 				state = KEY_STATE::UP;
 			else
-				state = KEY_STATE::DOWN;
+				state = KEY_STATE::NONE;
 		}
 	}
+
+	// 현재 창에서 마우스 위치를 얻음.
+	::GetCursorPos(&_mousePos);
+	::ScreenToClient(GEngine->GetWindow().hwnd, &_mousePos);
 }

@@ -14,6 +14,7 @@
 #include "Resources.h"
 #include "ParticleSystem.h"
 #include "Terrain.h"
+#include "SphereCollider.h"
 
 void SceneManager::Update()
 {
@@ -60,6 +61,57 @@ uint8 SceneManager::LayerNameToIndex(const wstring& name)
 		return 0;
 
 	return findIt->second;
+}
+
+shared_ptr<class GameObject> SceneManager::Pick(int32 screenX, int32 screenY)
+{
+	shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();	// 메인 카메라를 가져옮
+
+	// 현재 스크린의 너비와 높이를 구함
+	float width = static_cast<float>(GEngine->GetWindow().width);
+	float height = static_cast<float>(GEngine->GetWindow().height);
+
+	Matrix projectionMatrix = camera->GetProjectionMatrix();
+
+	// ViewSpace에서 Picking 진행
+	float viewX = (+2.0f * screenX / width - 1.0f) / projectionMatrix(0, 0);
+	float viewY = (-2.0f * screenY / height + 1.0f) / projectionMatrix(1, 1);
+
+	Matrix viewMatrix = camera->GetViewMatrix();	// View 행렬
+	Matrix viewMatrixInv = viewMatrix.Invert();		// View 역행렬
+
+	auto& gameObjects = GET_SINGLE(SceneManager)->GetActiveScene()->GetGameObjects();
+
+	float minDistance = FLT_MAX;
+	shared_ptr<GameObject> picked;
+
+	for (auto& gameObject : gameObjects)
+	{
+		if (gameObject->GetCollider() == nullptr)
+			continue;
+
+		// ViewSpace에서의 Ray 정의
+		Vec4 rayOrigin = Vec4(0.0f, 0.0f, 0.0f, 1.0f);	// view 공간에선 카메라 위치가 원점. (카메라 시점이니까)
+		Vec4 rayDir = Vec4(viewX, viewY, 1.0f, 0.0f);	// 광선의 방향
+
+		// WorldSpace에서의 Ray 정의
+		rayOrigin = XMVector3TransformCoord(rayOrigin, viewMatrixInv);
+		rayDir = XMVector3TransformNormal(rayDir, viewMatrixInv);
+		rayDir.Normalize();
+
+		// WorldSpace에서 연산
+		float distance = 0.f;
+		if (gameObject->GetCollider()->Intersects(rayOrigin, rayDir, OUT distance) == false)
+			continue;
+
+		if (distance < minDistance)
+		{
+			minDistance = distance;
+			picked = gameObject;
+		}
+	}
+
+	return picked;
 }
 
 shared_ptr<Scene> SceneManager::LoadTestScene()
@@ -150,9 +202,11 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 #pragma endregion
 
 #pragma region Object
-/*	{
+	{
 		shared_ptr<GameObject> obj = make_shared<GameObject>();
+		obj->SetName(L"OBJ");
 		obj->AddComponent(make_shared<Transform>());
+		obj->AddComponent(make_shared<SphereCollider>());
 		obj->GetTransform()->SetLocalScale(Vec3(100.0f, 100.0f, 100.0f));
 		obj->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 500.0f));
 		obj->SetStatic(false);
@@ -166,9 +220,12 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 			shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"GameObject");
 			meshRenderer->SetMaterial(material->Clone());
 		}
+
+		dynamic_pointer_cast<SphereCollider>(obj->GetCollider())->SetRadius(0.5f);
+		dynamic_pointer_cast<SphereCollider>(obj->GetCollider())->SetCenter(Vec3(0.0f, 0.0f, 0.0f));
 		obj->AddComponent(meshRenderer);
 		scene->AddGameObject(obj);
-	}*/	
+	}	
 #pragma endregion
 
 #pragma region Terrain

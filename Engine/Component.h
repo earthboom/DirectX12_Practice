@@ -10,6 +10,7 @@ enum class COMPONENT_TYPE : uint8
 	LIGHT,
 	PARTICLE_SYSTEM,
 	TERRAIN,
+	COLLIDER,
 	//......
 	MONO_BEHAVIOUR,	// 여러 개를 가질 수 있다.
 	END
@@ -51,7 +52,5 @@ private:
 protected:
 	COMPONENT_TYPE _type;
 	weak_ptr<GameObject> _gameObject;
-
-private:
 };
 
