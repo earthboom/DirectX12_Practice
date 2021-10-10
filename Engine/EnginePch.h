@@ -35,6 +35,8 @@ using namespace Microsoft::WRL;
 #include <DirectXTex/DirectXTex.h>
 #include <DirectXTex/DirectXTex.inl>
 
+#include "fbxsdk.h"
+
 // lib
 #pragma comment(lib, "d3d12")
 #pragma comment(lib, "dxgi")
@@ -47,24 +49,34 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "DirectXTex\\DirectXTex.lib")
 #endif
 
+#ifdef _DEBUG
+#pragma comment(lib, "debug\\libfbxsdk-md.lib")
+#pragma comment(lib, "debug\\libxml2-md.lib")
+#pragma comment(lib, "debug\\zlib-md.lib")
+#else
+#pragma comment(lib, "release\\libfbxsdk-md.lib")
+#pragma comment(lib, "release\\libxml2-md.lib")
+#pragma comment(lib, "release\\zlib-md.lib")
+#endif
+
 // typedef
-using int8		= __int8;
-using int16		= __int16;
-using int32		= __int32;
-using int64		= __int64;
-using uint8		= unsigned __int8;
-using uint16	= unsigned __int16;
-using uint32	= unsigned __int32;
-using uint64	= unsigned __int64;
-using Vec2		= DirectX::SimpleMath::Vector2;
-using Vec3		= DirectX::SimpleMath::Vector3;
-using Vec4		= DirectX::SimpleMath::Vector4;
-using Matrix	= DirectX::SimpleMath::Matrix;
+using int8 = __int8;
+using int16 = __int16;
+using int32 = __int32;
+using int64 = __int64;
+using uint8 = unsigned __int8;
+using uint16 = unsigned __int16;
+using uint32 = unsigned __int32;
+using uint64 = unsigned __int64;
+using Vec2 = DirectX::SimpleMath::Vector2;
+using Vec3 = DirectX::SimpleMath::Vector3;
+using Vec4 = DirectX::SimpleMath::Vector4;
+using Matrix = DirectX::SimpleMath::Matrix;
 
 enum class CBV_REGISTER : uint8
 {
 	b0,
-	b1, 
+	b1,
 	b2,
 	b3,
 	b4,
@@ -130,6 +142,8 @@ struct Vertex
 	Vec2 uv;
 	Vec3 normal;
 	Vec3 tangent;
+	Vec4 weights;	// 영향을 받는 가중치
+	Vec4 indices;
 };
 
 // Singleton Macro
@@ -172,3 +186,7 @@ struct TransformParams
 };
 
 extern unique_ptr<class Engine> GEngine;
+
+//Utils
+wstring s2ws(const string& s);
+string ws2s(const wstring& s);

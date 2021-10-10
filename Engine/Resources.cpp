@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Resources.h"
 #include "Engine.h"
+#include "MeshData.h"
 
 void Resources::Init()
 {
@@ -21,7 +22,7 @@ shared_ptr<Mesh> Resources::LoadPointMesh()
 	idx[0] = 0;
 
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
-	mesh->Init(vec, idx);
+	mesh->Create(vec, idx);
 	Add(L"Point", mesh);
 
 	return mesh;
@@ -51,7 +52,7 @@ shared_ptr<Mesh> Resources::LoadRectangleMesh()
 	idx[3] = 0; idx[4] = 2; idx[5] = 3;
 
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
-	mesh->Init(vec, idx);
+	mesh->Create(vec, idx);
 	Add(L"Rectangle", mesh);
 
 	return mesh;
@@ -122,7 +123,7 @@ shared_ptr<Mesh> Resources::LoadCubeMesh()
 	idx[33] = 20; idx[34] = 22; idx[35] = 23;
 
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
-	mesh->Init(vec, idx);
+	mesh->Create(vec, idx);
 	Add(L"Cube", mesh);
 
 	return mesh;
@@ -240,7 +241,7 @@ shared_ptr<Mesh> Resources::LoadSphereMesh()
 	}
 
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
-	mesh->Init(vec, idx);
+	mesh->Create(vec, idx);
 	Add(L"Sphere", mesh);
 
 	return mesh;
@@ -263,7 +264,7 @@ shared_ptr<Mesh> Resources::LoadTerrainMesh(int32 sizeX, int32 sizeZ)
 			vec.emplace_back(vtx);
 		}
 	}
-	
+
 	vector<uint32> idx;
 
 	for (int32 z = 0; z < sizeZ; ++z)
@@ -274,13 +275,13 @@ shared_ptr<Mesh> Resources::LoadTerrainMesh(int32 sizeX, int32 sizeZ)
 			//   |	\
 			//  [2] - [1]
 			idx.emplace_back((sizeX + 1) * (z + 1) + (x));
-			idx.emplace_back((sizeX + 1) * (z) + (x + 1));
-			idx.emplace_back((sizeX + 1) * (z) + (x));
+			idx.emplace_back((sizeX + 1) * (z)+(x + 1));
+			idx.emplace_back((sizeX + 1) * (z)+(x));
 
 			//  [1] - [2]
 			//   	\  |
 			//		  [0]
-			idx.emplace_back((sizeX + 1) * (z) + (x + 1));
+			idx.emplace_back((sizeX + 1) * (z)+(x + 1));
 			idx.emplace_back((sizeX + 1) * (z + 1) + (x));
 			idx.emplace_back((sizeX + 1) * (z + 1) + (x + 1));
 		}
@@ -289,19 +290,19 @@ shared_ptr<Mesh> Resources::LoadTerrainMesh(int32 sizeX, int32 sizeZ)
 	shared_ptr<Mesh> findMesh = Get<Mesh>(L"Terrain");
 	if (findMesh)
 	{
-		findMesh->Init(vec, idx);
+		findMesh->Create(vec, idx);
 		return findMesh;
 	}
 
 	shared_ptr<Mesh> mesh = make_shared<Mesh>();
-	mesh->Init(vec, idx);
+	mesh->Create(vec, idx);
 	Add(L"Terrain", mesh);
 
 	return mesh;
 }
 
-shared_ptr<Texture> Resources::CreateTexture(const wstring& name, DXGI_FORMAT format, uint32 width, uint32 height, 
-	const D3D12_HEAP_PROPERTIES& heapProperty, D3D12_HEAP_FLAGS heapFlags, D3D12_RESOURCE_FLAGS resFlags, 
+shared_ptr<Texture> Resources::CreateTexture(const wstring& name, DXGI_FORMAT format, uint32 width, uint32 height,
+	const D3D12_HEAP_PROPERTIES& heapProperty, D3D12_HEAP_FLAGS heapFlags, D3D12_RESOURCE_FLAGS resFlags,
 	Vec4 clearColor)
 {
 	shared_ptr<Texture> texture = make_shared<Texture>();
@@ -318,6 +319,21 @@ shared_ptr<Texture> Resources::CreateTextureFromResource(const wstring& name, Co
 	Add(name, texture);
 
 	return texture;
+}
+
+shared_ptr<class MeshData> Resources::LoadFBX(const wstring& path)
+{
+	wstring key = path;
+
+	shared_ptr<MeshData> meshData = Get<MeshData>(key);
+	if (meshData)
+		return meshData;
+
+	meshData = MeshData::LoadFromFBX(path);
+	meshData->SetName(key);
+	Add(key, meshData);
+
+	return meshData;
 }
 
 void Resources::CreateDefulatShader()
@@ -388,7 +404,7 @@ void Resources::CreateDefulatShader()
 		ShaderInfo info =
 		{
 			SHADER_TYPE::LIGHTING,
-			RASTERIZER_TYPE::CULL_NONE,	
+			RASTERIZER_TYPE::CULL_NONE,
 			DEPTH_STENCIL_TYPE::NO_DEPTH_TEST_NO_WRITE,
 			BLEND_TYPE::ONE_TO_ONE_BLEND
 		};
