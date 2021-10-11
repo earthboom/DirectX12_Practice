@@ -16,6 +16,7 @@
 #include "Terrain.h"
 #include "SphereCollider.h"
 #include "MeshData.h"
+#include "TestBlackDragon.h"
 
 void SceneManager::Update()
 {
@@ -309,6 +310,8 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 			gameObj->GetTransform()->SetLocalPosition(Vec3(0.0f, 0.0f, 300.0f));
 			gameObj->GetTransform()->SetLocalScale(Vec3(1.0f, 1.0f, 1.0f));
 			scene->AddGameObject(gameObj);
+
+			gameObj->AddComponent(make_shared<TestBlackDragon>());
 		}
 	}
 #pragma endregion

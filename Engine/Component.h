@@ -11,6 +11,7 @@ enum class COMPONENT_TYPE : uint8
 	PARTICLE_SYSTEM,
 	TERRAIN,
 	COLLIDER,
+	ANIMATOR,
 	//......
 	MONO_BEHAVIOUR,	// 여러 개를 가질 수 있다.
 	END
@@ -23,6 +24,8 @@ enum
 
 class GameObject;
 class Transform;
+class MeshRenderer;
+class Animator;
 
 class Component : public Object
 {
@@ -42,8 +45,10 @@ public:
 	COMPONENT_TYPE GetType() { return _type; }
 	bool IsValid() { return _gameObject.expired() == false; }	// _gmaeObject 확인 함수
 
-	shared_ptr<GameObject> GetGameObject();
-	shared_ptr<Transform> GetTransform();
+	shared_ptr<GameObject>		GetGameObject();
+	shared_ptr<Transform>		GetTransform();
+	shared_ptr<MeshRenderer>	GetMeshRenderer();
+	shared_ptr<Animator>		GetAnimator();
 
 private:
 	friend class GameObject;	//GameObject에게만 접근권한을 연다.

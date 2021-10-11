@@ -2,13 +2,15 @@
 #define _DEFERRED_FX_
 
 #include "params.fx"
-
+#include "utils.fx"
 struct VS_IN
 {
     float3 pos : POSITION;
     float2 uv : TEXCOORD;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
+    float4 weight : WEIGHT;
+    float4 indices : INDICES;
 
     row_major matrix matWorld : W;
     row_major matrix matWV : WV;
@@ -33,6 +35,9 @@ VS_OUT VS_Main(VS_IN input)
 
     if (g_int_0 == 1)    // Instance를 의미
     {
+        if (g_int_1 == 1)
+            Skinning(input.pos, input.normal, input.tangent, input.weight, input.indices);
+
         output.pos = mul(float4(input.pos, 1.0f), input.matWVP);
         output.uv = input.uv;
 
@@ -44,6 +49,9 @@ VS_OUT VS_Main(VS_IN input)
     }
     else
     {
+        if (g_int_1 == 1)
+            Skinning(input.pos, input.normal, input.tangent, input.weight, input.indices);
+
         output.pos = mul(float4(input.pos, 1.0f), g_matWVP);    // 투영 좌표계까지
         output.uv = input.uv;
 

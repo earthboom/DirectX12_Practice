@@ -143,7 +143,7 @@ struct Vertex
 	Vec3 normal;
 	Vec3 tangent;
 	Vec4 weights;	// 영향을 받는 가중치
-	Vec4 indices;
+	Vec4 indices;	// 몇 번째 뼈대인지를 나타내는 인덱스
 };
 
 // Singleton Macro
@@ -183,6 +183,13 @@ struct TransformParams
 	Matrix matWV;
 	Matrix matWVP;
 	Matrix matViewInv;
+};
+
+struct AnimFrameParams
+{
+	Vec4 scale;
+	Vec4 rotation;		//Quaternion
+	Vec4 translation;
 };
 
 extern unique_ptr<class Engine> GEngine;

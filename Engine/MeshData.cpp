@@ -6,6 +6,7 @@
 #include "Resources.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
+#include "Animator.h"
 
 MeshData::MeshData()
 	: Object(OBJECT_TYPE::MESH_DATA)
@@ -25,7 +26,7 @@ shared_ptr<MeshData> MeshData::LoadFromFBX(const wstring& path)
 
 	for (int32 i = 0; i < loader.GetMeshCount(); ++i)
 	{
-		shared_ptr<Mesh> mesh = Mesh::CreateFromFBX(&loader.GetMesh(i));
+		shared_ptr<Mesh> mesh = Mesh::CreateFromFBX(&loader.GetMesh(i), loader);
 
 		GET_SINGLE(Resources)->Add<Mesh>(mesh->GetName(), mesh);
 
@@ -67,6 +68,14 @@ vector<shared_ptr<GameObject>> MeshData::Instantiate()
 
 		for (uint32 i = 0; i < info.materials.size(); ++i)
 			gameObj->GetMeshRenderer()->SetMaterial(info.materials[i], i);
+
+		if (info.mesh->IsAnimMesh())
+		{
+			shared_ptr<Animator> animator = make_shared<Animator>();
+			gameObj->AddComponent(animator);
+			animator->SetBones(info.mesh->GetBones());
+			animator->SetAnimClip(info.mesh->GetAnimClip());
+		}
 
 		v.emplace_back(gameObj);
 	}

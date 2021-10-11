@@ -14,7 +14,7 @@ struct FbxMaterialInfo
 
 struct BoneWeight
 {
-	using Pair = pair<int32, double>;
+	using Pair = pair<int32, double>; // <본 인덱스, 영향을 받는 가중치>
 	vector<Pair> boneWeights;
 
 	void AddWeights(uint32 index, double weight)
@@ -28,13 +28,14 @@ struct BoneWeight
 		if (findIt != boneWeights.end())
 			boneWeights.insert(findIt, Pair(index, weight));
 		else
-			boneWeights.push_back(Pair(index, weight));
+			boneWeights.emplace_back(Pair(index, weight));
 
 		// 가중치는 최대 4개
 		if (boneWeights.size() > 4)
 			boneWeights.pop_back();
 	}
 
+	// 최대값을 1로 하는 정규화 함수
 	void Normalize()
 	{
 		double sum = 0.f;
@@ -62,18 +63,18 @@ struct FbxKeyFrameInfo
 
 struct FbxBoneInfo
 {
-	wstring					boneName;
-	int32					parentIndex;
-	FbxAMatrix				matOffset;
+	wstring		boneName;
+	int32		parentIndex;
+	FbxAMatrix	matOffset;
 };
 
 struct FbxAnimClipInfo
 {
-	wstring			name;
-	FbxTime			startTime;
-	FbxTime			endTime;
-	FbxTime::EMode	mode;
-	vector<vector<FbxKeyFrameInfo>>	keyFrames;
+	wstring			name;			// 애니메이션 이름
+	FbxTime			startTime;		// 시작 시간 ( 모든 애니메이션이 하나로 통합되는 경우도 있어서 ) 
+	FbxTime			endTime;		// 끝나는 시간
+	FbxTime::EMode	mode;			
+	vector<vector<FbxKeyFrameInfo>>	keyFrames;	// 뼈대 개수만큼 있음
 };
 
 class FBXLoader

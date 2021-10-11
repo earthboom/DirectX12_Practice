@@ -24,8 +24,8 @@ void FBXLoader::LoadFbx(const wstring& path)
 	Import(path);
 
 	// Animation	
-	//LoadBones(_scene->GetRootNode());
-	//LoadAnimationInfo();
+	LoadBones(_scene->GetRootNode());	// 뼈대
+	LoadAnimationInfo();
 
 	// 로드된 데이터 파싱 (Mesh/Material/Skin)
 	ParseNode(_scene->GetRootNode());
@@ -147,7 +147,7 @@ void FBXLoader::LoadMesh(FbxMesh* mesh)
 		meshInfo.indices[subsetIdx].emplace_back(arrIdx[1]);
 	}
 
-	// Animation
+	// Animation (실질적인 애니메이션 정보)
 	LoadAnimationData(mesh, &meshInfo);
 }
 
@@ -378,6 +378,7 @@ void FBXLoader::LoadBones(FbxNode* node, int32 idx, int32 parentIdx)
 		LoadBones(node->GetChild(i), static_cast<int32>(_bones.size()), idx);
 }
 
+// 가장 기본적인 애니메이션 정보만을 불러옮, 실질적인 애니메이션 정보는 아직 불러오지 않음
 void FBXLoader::LoadAnimationInfo()
 {
 	_scene->FillAnimStackNameArray(OUT _animNames);
@@ -430,8 +431,8 @@ void FBXLoader::LoadAnimationData(FbxMesh* mesh, FbxMeshInfo* meshInfo)
 					assert(boneIdx >= 0);
 
 					FbxAMatrix matNodeTransform = GetTransform(mesh->GetNode());
-					LoadBoneWeight(cluster, boneIdx, meshInfo);
-					LoadOffsetMatrix(cluster, matNodeTransform, boneIdx, meshInfo);
+					LoadBoneWeight(cluster, boneIdx, meshInfo);	// 뼈대가 영향을 받는 가중치
+					LoadOffsetMatrix(cluster, matNodeTransform, boneIdx, meshInfo); // offset 행렬 
 
 					const int32 animCount = _animNames.Size();
 					for (int32 k = 0; k < animCount; k++)
@@ -441,7 +442,7 @@ void FBXLoader::LoadAnimationData(FbxMesh* mesh, FbxMeshInfo* meshInfo)
 		}
 	}
 
-	FillBoneWeight(mesh, meshInfo);
+	FillBoneWeight(mesh, meshInfo);	// 가중치를 채워줌
 }
 
 
@@ -530,6 +531,7 @@ void FBXLoader::LoadKeyframe(int32 animIndex, FbxNode* node, FbxCluster* cluster
 	FbxLongLong startFrame = _animClips[animIndex]->startTime.GetFrameCount(timeMode);
 	FbxLongLong endFrame = _animClips[animIndex]->endTime.GetFrameCount(timeMode);
 
+	// 각 프레임마다 해당 애니메이션의 KeyFrame을 추출 (To Root)
 	for (FbxLongLong frame = startFrame; frame < endFrame; frame++)
 	{
 		FbxKeyFrameInfo keyFrameInfo = {};
